@@ -82,12 +82,6 @@ export const registerUser = TryCatch(async(req,res)=>{
     res.json({
         message: "If your email is valid , a verification link has been sent, It will expire in 5 minutes "
     })
-
-    res.json({
-        name,
-        email,
-        password
-    })
 });
 
 export const verifyUser = TryCatch(async(req,res) => {
