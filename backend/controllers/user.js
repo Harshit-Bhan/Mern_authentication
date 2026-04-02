@@ -5,6 +5,8 @@ import sanitize from "mongo-sanitize";
 import { User } from "../models/User.js";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
+import { getVerifyEmailHtml } from "../config/html.js";
+import sendMail from "../config/sendMail.js";
 
 export const registerUser = TryCatch(async(req,res)=>{
 
@@ -68,9 +70,70 @@ export const registerUser = TryCatch(async(req,res)=>{
 
     await redisClient.setEx(verifyKey, 300, datatoStore);
 
+    const subject = "Verify your email for Account Creation";
+    const html = getVerifyEmailHtml({ email, token: verifyToken });
+
+    await sendMail({ email, subject , html }); 
+
+    await redisClient.set(rateLimitKey, "true" , {
+        EX: 60
+    });
+
+    res.json({
+        message: "If your email is valid , a verification link has been sent, It will expire in 5 minutes "
+    })
+
     res.json({
         name,
         email,
         password
     })
 });
+
+export const verifyUser = TryCatch(async(req,res) => {
+    const {token} = req.params;
+
+    if(!token){
+        return res.status(400).json({
+            message: "Verification token is required",
+        });
+    }
+
+    const verifyKey = `verify:${token}`;
+
+    const userDataJson = await redisClient.get(verifyKey)
+
+    if(!userDataJson){
+        return res.status(400).json({
+            message: "Verification link is expried",
+        })
+    }
+
+    await redisClient.del(verifyKey);
+
+    const userData = JSON.parse(userDataJson);  
+
+    const existingUser = await User.findOne({email: userData.email});
+
+    if(existingUser){
+        return res.status(400).json({
+            message: "User with this email already exists",
+        });
+    }
+
+    const newUser = await User.create({
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+    });
+
+    res.status(201).json({
+        message: "User verified and created successfully",
+        user: {
+            _id: newUser._id,
+            name: newUser.name,
+            email: newUser.email,
+        }
+    })
+
+})
