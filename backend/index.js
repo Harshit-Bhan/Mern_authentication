@@ -4,6 +4,7 @@ import connectDb from "./config/db.js";
 import user from "./routes/user.js"
 import {createClient} from 'redis';
 import chalk from "chalk";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ redisClient
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/v1",user);
 
