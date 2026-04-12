@@ -4,7 +4,7 @@ import { User } from '../models/User.js';
 
 export const isAuth = async(req,res,next)=>{
     try {
-        const token = req.cookies.access_token;
+        const token = req.cookies.accessToken;
 
         if(!token){
             return res.status(403).json({
@@ -20,10 +20,10 @@ export const isAuth = async(req,res,next)=>{
             })
         }
 
-        const cacheduser = await redisClient.get(`user:${decodedData.id}`);
+        const cacheUser = await redisClient.get(`user:${decodedData.id}`);
 
-        if(cacheduser){
-            req.user = JSON.parse(cacheduser);
+        if(cacheUser){
+            req.user = JSON.parse(cacheUser);
             return next();
         }
 
