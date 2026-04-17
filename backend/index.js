@@ -5,6 +5,7 @@ import user from "./routes/user.js"
 import {createClient} from 'redis';
 import chalk from "chalk";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 dotenv.config();
 
@@ -31,6 +32,11 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+    methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+}));
 
 app.use("/api/v1",user);
 
