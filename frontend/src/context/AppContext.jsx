@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import {server} from "../main";
-import axios from "axios";
+import api from "../apiIntercepter";
 
 const AppContext = createContext(null);
 
@@ -12,13 +11,13 @@ export const AppProvider = ({ children }) => {
     async function fetchUser() {
         setLoading(true);
         try {
-            const { data } = await axios.get(`${server}/api/v1/me`,{
-                withCredentials: true,
-            });
+            const { data } = await api.get("/api/v1/me");
             setUser(data.user);
             setIsAuth(true);
         } catch (error) {
-            console.log(error);
+            console.log("User not authenticated");
+            setIsAuth(false);
+            setUser(null);
         } finally {
             setLoading(false);
         }
@@ -29,17 +28,18 @@ export const AppProvider = ({ children }) => {
     }, []);
 
     return (
-        <AppContext.Provider value={{ setIsAuth , isAuth , user , setUser , loading }}>
+        <AppContext.Provider value={{ user, setUser, isAuth, setIsAuth, loading }}>
             {children}
         </AppContext.Provider>
-    )
-}
+    );
+};
 
 export const AppData = () => {
     const context = useContext(AppContext);
 
-    if(!context) {
-        throw new Error("AppContext must be used within an AppProvider");
+    if (!context) {
+        throw new Error("AppContext must be used within AppProvider");
     }
+
     return context;
-}
+};
