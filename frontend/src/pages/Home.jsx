@@ -7,8 +7,10 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await logoutUser();      
-    navigate("/login");     
+    const success = await logoutUser();
+    if (success) {
+      navigate("/login");
+    }
   };
 
   return (

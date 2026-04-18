@@ -20,8 +20,8 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={isAuth ? <Navigate to="/" replace /> : <Login />} />
-        <Route path="/register" element={isAuth ? <Navigate to="/" replace /> : <Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/dashboard" element={isAuth ? <Dashboard /> : <Navigate to="/login" replace />} />

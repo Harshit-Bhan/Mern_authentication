@@ -30,16 +30,19 @@ export const AppProvider = ({ children }) => {
             toast.success(data.message);
             setIsAuth(false);
             setUser(null);
+            return true;
         } catch (error) {
-            toast.error("Something went wrong");
-        }}
+            toast.error(error?.response?.data?.message || "Something went wrong");
+            return false;
+        }
+    }
 
     useEffect(() => {
         fetchUser();
     }, []);
 
     return (
-        <AppContext.Provider value={{ user, setUser, isAuth, setIsAuth, loading, logoutUser }}>
+        <AppContext.Provider value={{ user, setUser, isAuth, setIsAuth, loading, logoutUser, fetchUser }}>
             {children}
         </AppContext.Provider>
     );

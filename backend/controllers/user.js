@@ -8,6 +8,7 @@ import bcrypt, { compare } from "bcrypt";
 import { getOtpHtml, getVerifyEmailHtml } from "../config/html.js";
 import sendMail from "../config/sendMail.js";
 import { generateAccessToken, generateToken, revokeRefreshToken, verifyRefreshToken } from "../config/generateToken.js";
+import { generateCsrfToken } from "../config/csrfMiddleware.js";
 
 export const registerUser = TryCatch(async(req,res)=>{
 
@@ -299,6 +300,7 @@ export const logoutUser = TryCatch(async(req,res) => {
 
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
+    res.clearCookie("csrfToken");
 
     await redisClient.del(`user:${userId}`);
 
@@ -306,3 +308,14 @@ export const logoutUser = TryCatch(async(req,res) => {
         message: "Logged out successfully",
     })
 })
+
+export const refreshCSRF = TryCatch(async(req,res) => {
+    const userId = req.user._id;
+
+    const newCSRFToken = await generateCsrfToken(userId,res);
+
+    res.json({
+        message: "CSRF token refreshed successfully",
+        csrfToken: newCSRFToken,
+    });
+});
