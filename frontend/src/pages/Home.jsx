@@ -1,10 +1,12 @@
 import React from 'react'
 import { AppData } from '../context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Home = () => {
-  const {logoutUser} = AppData();
+  const {logoutUser,user} = AppData();
   const navigate = useNavigate();
+
+
 
   const handleLogout = async () => {
     const success = await logoutUser();
@@ -18,6 +20,13 @@ const Home = () => {
       <button className='bg-red-500 text-white p-2 rounded-md' onClick={handleLogout}>
         Logout
       </button>
+      {
+        user && user.role === 'admin' && (
+          <Link className='bg-purple-500 text-white p-2 rounded-md' to="/dashboard">
+            Dashboard
+          </Link>
+        )
+      }
     </div>
   )
 }

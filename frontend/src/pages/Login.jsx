@@ -50,7 +50,7 @@ const Login = () => {
       <button className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg" disabled={btnLoading}>
         {btnLoading ? "Logging in..." : "Login"}
       </button>
-      <Link to="/register" className="text-xs text-gray-500 mt-3">Don't have an account</Link>
+      <Link to="/register" className="text-xs text-gray-500 mt-3">Don't have an account?</Link>
     </form>
   </div>
 </section>

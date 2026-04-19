@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { loginUser, logoutUser, myProfile, refreshCSRF, refreshToken, registerUser, verifyOtp, verifyUser } from "../controllers/user.js";
-import { isAuth } from "../middlewares/isAuth.js";
+import { adminController, loginUser, logoutUser, myProfile, refreshCSRF, refreshToken, registerUser, verifyOtp, verifyUser } from "../controllers/user.js";
+import { authorizeAdmin, isAuth } from "../middlewares/isAuth.js";
 import { verifyCsrfToken } from "../config/csrfMiddleware.js";
 
 const router = Router();
@@ -13,6 +13,7 @@ router.get("/me",isAuth,myProfile)
 router.post("/refresh",refreshToken)
 router.post("/logout",isAuth, verifyCsrfToken, logoutUser)
 router.post("/refresh-csrf",isAuth, refreshCSRF)
+router.get("/admin",isAuth , authorizeAdmin, adminController)
 
 export default router;
 

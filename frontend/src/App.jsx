@@ -19,10 +19,10 @@ const App = () => {
    ) : (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/verify" element={<Verify />} />
+        <Route path="/" element={isAuth ? <Home /> : <Navigate to="/login" replace /> } />
+        <Route path="/login" element={isAuth ? <Home/> : <Login />} />
+        <Route path="/register" element={isAuth ? <Home/> : <Register />} />
+        <Route path="/verify/:token" element={isAuth ? <Home/> : <Verify />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/dashboard" element={isAuth ? <Dashboard /> : <Navigate to="/login" replace />} />
       </Routes>

@@ -40,7 +40,9 @@ export const registerUser = TryCatch(async(req,res)=>{
         });
     }
 
-    const { name , email , password } = validation.data;
+    const name = validation.data.name.trim();
+    const email = validation.data.email.trim().toLowerCase();
+    const password = validation.data.password;
 
     const rateLimitKey = `register-rate-limit:${req.ip}:${email}`;
 
@@ -97,7 +99,7 @@ export const verifyUser = TryCatch(async(req,res) => {
 
     const verifyKey = `verify:${token}`;
 
-    const userDataJson = await redisClient.get(verifyKey)
+    const userDataJson = await redisClient.getDel(verifyKey)
 
     if(!userDataJson){
         return res.status(400).json({
@@ -105,9 +107,9 @@ export const verifyUser = TryCatch(async(req,res) => {
         })
     }
 
-    await redisClient.del(verifyKey);
-
-    const userData = JSON.parse(userDataJson);  
+    const userData = JSON.parse(userDataJson);
+    userData.name = userData.name.trim();
+    userData.email = userData.email.trim().toLowerCase();
 
     const existingUser = await User.findOne({email: userData.email});
 
@@ -117,11 +119,23 @@ export const verifyUser = TryCatch(async(req,res) => {
         });
     }
 
-    const newUser = await User.create({
-        name: userData.name,
-        email: userData.email,
-        password: userData.password,
-    });
+    let newUser;
+
+    try {
+        newUser = await User.create({
+            name: userData.name,
+            email: userData.email,
+            password: userData.password,
+        });
+    } catch (error) {
+        if(error?.code === 11000){
+            return res.status(400).json({
+                message: "User with this email already exists",
+            });
+        }
+
+        throw error;
+    }
 
     res.status(201).json({
         message: "User verified and created successfully",
@@ -164,7 +178,8 @@ export const loginUser = TryCatch(async(req,res)=>{
         });
     }
 
-    const { email , password } = validation.data;
+    const email = validation.data.email.trim().toLowerCase();
+    const password = validation.data.password;
 
     const rateLimitKey = `login-rate-limit:${req.ip}:${email}`;
 
@@ -319,3 +334,10 @@ export const refreshCSRF = TryCatch(async(req,res) => {
         csrfToken: newCSRFToken,
     });
 });
+
+export const adminController = TryCatch(async(req,res) => {
+    res.json({
+        message: "Welcome to admin control panel",
+        user: req.user,
+    })
+})
